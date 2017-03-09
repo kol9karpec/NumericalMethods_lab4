@@ -1,0 +1,46 @@
+Root: x = (0.661773 , -1.50362)
+
+Iteration #1
+xk = (0.665201 , -1.502027)
+Residuals vector: (0.000000 , 0.001921)
+Norma: 0.001921
+
+Iteration #2
+xk = (0.663280 , -1.502921)
+Residuals vector: (-0.000000 , 0.000847)
+Norma: 0.000847
+
+Iteration #3
+xk = (0.662433 , -1.503314)
+Residuals vector: (0.000000 , 0.000373)
+Norma: 0.000373
+
+Iteration #4
+xk = (0.662060 , -1.503487)
+Residuals vector: (0.000000 , 0.000164)
+Norma: 0.000164
+
+Iteration #5
+xk = (0.661896 , -1.503563)
+Residuals vector: (-0.000000 , 0.000072)
+Norma: 0.000072
+
+Iteration #6
+xk = (0.661824 , -1.503597)
+Residuals vector: (0.000000 , 0.000032)
+Norma: 0.000032
+
+Iteration #7
+xk = (0.661793 , -1.503611)
+Residuals vector: (0.000000 , 0.000014)
+Norma: 0.000014
+
+Iteration #8
+xk = (0.661779 , -1.503618)
+Residuals vector: (0.000000 , 0.000006)
+Norma: 0.000006
+
+Iteration #9
+xk = (0.661773 , -1.503621)
+Residuals vector: (0.000000 , 0.000003)
+Norma: 0.000003
