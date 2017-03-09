@@ -44,14 +44,20 @@ int main(int argc, const char * argv[])
 	int order;
 	in >> order;
 
-	double * initApprx = new double[order];
-	for (int i = 0; i < order; i++)
-		in >> initApprx[i];
-
 	double eps;
 	in >> eps;
 
-	char ** iterations = new char*[1];
+	//Simple iterations
+
+	int nApprx;
+	in >> nApprx;
+	double ** initApprx = new double*[nApprx];
+	for (int i = 0; i < nApprx; i++)
+	{
+		initApprx[i] = new double[order];
+		for (int j = 0; j<order; j++)
+			in >> initApprx[i][j];
+	}
 
 	pfn ** fArr = new pfn*[2];
 	fArr[0] = f1I_Iter;
@@ -60,50 +66,74 @@ int main(int argc, const char * argv[])
 	pfn ** FArr = new pfn*[2];
 	FArr[0] = f1I;
 	FArr[1] = f2I;
-
-	//Simple iterations
-	double * root = simpleIteration(initApprx, fArr, FArr, order, eps, iterations);
-
 	out << "Simple iterations" << endl;
-	out << "Root: x = (";
-	for (int i = 0; i < order; i++)
+	out << "------------------------------------------------" << endl;
+	for (int n = 0; n < nApprx; n++)
 	{
-		out << setprecision(-(int)(log10(eps / 10))) << root[i];
-		if (i != order - 1) out << " , ";
+		char ** iterations = new char*;
+		double * root = simpleIteration(initApprx[n], fArr, FArr, order, eps, iterations);
+			
+		out << "Root: x = (";
+		for (int i = 0; i < order; i++)
+		{
+			out << setprecision(-(int)(log10(eps / 10))) << root[i];
+			if (i != order - 1) out << " , ";
+		}
+
+		out << ")" << *iterations << endl;
+		out << "------------------------------------------------" << endl;
+		delete[] root;
+		delete[] * iterations;
+		delete iterations;
 	}
 
-	out << ")";
-	out << *iterations << endl;		
-	delete[] root;
-
+	for (int i = 0; i < nApprx; i++)
+		delete[] initApprx[i];
+	delete[] initApprx;
+	
 	//Newtons method
+
+	in >> nApprx;
+	initApprx = new double*[nApprx];
+	for (int i = 0; i < nApprx; i++)
+	{
+		initApprx[i] = new double[order];
+		for (int j = 0; j<order; j++)
+			in >> initApprx[i][j];
+	}
 
 	FArr[0] = f1II;
 	FArr[1] = f2II;
-	root = newtonsMethod(initApprx,jakobiFII,FArr,order,eps,iterations);
 
-	out << "------------------------------------------------" << endl;
 	out << "Newtons method" << endl;
-	out << "Root: x = (";
-	for (int i = 0; i < order; i++)
+	out << "------------------------------------------------" << endl;
+
+	for (int n = 0; n < nApprx; n++)
 	{
-		out << setprecision(-(int)(log10(eps / 10))) << root[i];
-		if (i != order - 1) out << " , ";
+		char ** iterations = new char*;
+		double * root = newtonsMethod(initApprx[n], jakobiFII, FArr, order, eps, iterations);
+
+		out << "Root: x = (";
+		for (int i = 0; i < order; i++)
+		{
+			out << setprecision(-(int)(log10(eps / 10))) << root[i];
+			if (i != order - 1) out << " , ";
+		}
+
+		out << ")";
+		out << *iterations << endl;
+		out << "------------------------------------------------" << endl;
+		delete[] root;
+		delete[] * iterations;
+		delete iterations;
 	}
-
-	out << ")";
-	out << *iterations << endl;
-
+	
 	delete[] initApprx;
-	delete[] * iterations;
-	delete[] iterations;
-	delete[] root;
 	delete[] fArr;
 	delete[] FArr;
 
 	in.close();
 	out.close();
-
 
 	return 0;
 }
@@ -244,20 +274,30 @@ double * newtonsMethod(double * x0, pFJakobi * J, pfn ** FArr,
 
 	while (true)
 	{
-		double * xPrev = new double[order];
-		for (int i = 0; i < order; i++)
-			xPrev[i] = res[i];
-
 		double ** jMatr = J(res[0], res[1], order);
 
 		TSLE dXSystem(jMatr,order);
-		double ** b = new double*;
-		*b = new double[order];
+
 		for (int i = 0; i < order; i++)
-			(*b)[i] = FArr[i](res[0], res[1]);
+			delete[] jMatr[i];
+		delete[] jMatr;
+
+		double ** b = new double*[order];
+		for (int i = 0; i < order; i++)
+		{
+			b[i] = new double[1];
+			b[i][0] = -FArr[i](res[0], res[1]);
+		}
+			
 
 		double det = 0;
 		double ** dX = dXSystem.gauss(b, 1, det, NULL);
+
+		//dXSystem.~TSLE();
+
+		for (int i = 0; i < order; i++)
+			delete[] b[i];
+		delete[] b;
 
 		for (int i = 0; i < order; i++)
 			res[i] += dX[i][0];
@@ -296,17 +336,20 @@ double * newtonsMethod(double * x0, pFJakobi * J, pfn ** FArr,
 
 		double * diffV = new double[order];
 		for (int i = 0; i < order; i++)
-			diffV[i] = res[i] - xPrev[i];
+			diffV[i] = dX[i][0];
 		double normaDiffV = norma(diffV, order);
 
-		delete[] xPrev;
+		for (int i = 0; i < order; i++)
+			delete[] dX[i];
+		delete[] dX;
 		delete[] FRes;
+		delete[] diffV;
 
 		iter++;
-
+		//cout << setprecision(5) << normaF << "\t" << normaDiffV << endl;
 		if ((normaF < eps) && (normaDiffV < eps)) break;
 	}
-
+	return res;
 }
 
 

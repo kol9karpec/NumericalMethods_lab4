@@ -53,7 +53,7 @@ TSLE::TSLE(double ** A, int order)
 double ** TSLE::gauss(double ** b, int count, double & det, char ** iterations)
 {
 	TSLE copyA(*this);
-	copyA.print();
+	//copyA.print();
 
 	double ** x = new double*[order];
 	for (int i = 0; i < order; i++)
